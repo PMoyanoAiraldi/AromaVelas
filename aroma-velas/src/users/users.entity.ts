@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn} from "typeorm";
+import { Order } from "src/order/order.entity";
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany} from "typeorm";
 
 export enum rolEnum {
     ADMIN = 'admin',
@@ -16,12 +17,6 @@ export class User {
     @Column({ length: 80, nullable: false })
     name: string;
 
-    @Column({ nullable: true })
-    address: string;
-
-    @Column({ nullable: true })
-    phone: number;
-
     @Column({ length: 50, unique: true, nullable: false })
     email: string;
 
@@ -35,6 +30,8 @@ export class User {
     })
     rol: rolEnum;
 
+    @OneToMany(() => Order, (order) => order.user)
+    order: Order[]
 
     @Column({ default: true }) // Por defecto, el usuario estará activo
     state: boolean;
