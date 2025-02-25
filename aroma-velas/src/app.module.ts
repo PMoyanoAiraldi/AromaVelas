@@ -23,8 +23,8 @@ import { DataSourceOptions } from 'typeorm';
     if (!config) {
       throw new Error('Database configuration not found');
     }
-    return config; 
-  }, //  Ahora estás seguro de que no es undefined
+    return config; // no es undefined
+  }, 
     
   }),
   UsersModule,

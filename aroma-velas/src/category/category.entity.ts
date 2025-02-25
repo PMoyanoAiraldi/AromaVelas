@@ -5,14 +5,14 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 export class Category{
     
     @PrimaryGeneratedColumn('uuid')
-    id: string
+    id!: string
 
     @Column({ length: 80, nullable: false})
-    name: string
+    name!: string
 
     @OneToMany(() => Products, (products) => products.category)
-    products: Products[]
+    products!: Products[]
 
     @Column({default: true})
-    state: boolean
+    state!: boolean
 }

@@ -12,27 +12,27 @@ export enum rolEnum {
 export class User {
 
     @PrimaryGeneratedColumn('uuid')
-    id: string;
+    id!: string;
 
     @Column({ length: 80, nullable: false })
-    name: string;
+    name!: string;
 
     @Column({ length: 50, unique: true, nullable: false })
-    email: string;
+    email!: string;
 
     @Column({ nullable: false })
-    password: string;
+    password!: string;
 
     @Column({
         type: 'enum',
         enum: rolEnum,
         default: rolEnum.CLIENTE,
     })
-    rol: rolEnum;
+    rol!: rolEnum;
 
     @OneToMany(() => Order, (order) => order.user)
-    order: Order[]
+    order!: Order[]
 
     @Column({ default: true }) // Por defecto, el usuario estará activo
-    state: boolean;
+    state!: boolean;
 }

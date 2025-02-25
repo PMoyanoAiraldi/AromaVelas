@@ -6,28 +6,28 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColum
 export class Products{
 
     @PrimaryGeneratedColumn('uuid')
-    id: string
+    id!: string
 
     @Column({length: 100, unique: true})
-    description: string
+    description!: string
 
     @Column({type: 'int'})
-    price: number
+    price!: number
 
     @Column({ nullable: true})
-    img: string
+    img!: string
 
     @Column({type: 'int'})
-    stock: number
+    stock!: number
 
     @Column({ type: 'uuid', name: "categoryId", nullable: false })
-    categoryId: string;
+    categoryId!: string;
 
 
     @ManyToOne(() => Category, (category) => category.products,)
     @JoinColumn({ name: "categoryId" })
-    category: Category;
+    category!: Category;
 
     @OneToMany(() => OrderProduct, (orderProduct) => orderProduct.product)
-    orderProduct: OrderProduct[]
+    orderProduct!: OrderProduct[]
 }

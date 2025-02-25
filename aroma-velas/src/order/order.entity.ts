@@ -6,37 +6,37 @@ import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "ty
 
 export class Order{
     @PrimaryGeneratedColumn('uuid')
-    id: string
+    id!: string
 
     @Column({ type: 'uuid', name: "userId", nullable: false })
-    userId: string;
+    userId!: string;
     
     
     @ManyToOne(() => User, (user) => user.order)
-    user: User;
+    user!: User;
 
     @OneToMany(() => OrderProduct, (orderProducts) => orderProducts.orders, { cascade: true })
-    orderProducts: OrderProduct[];
+    orderProducts!: OrderProduct[];
 
 
     @Column({type: 'int'})
-    total: number
+    total!: number
 
     @Column({length: 90, nullable: false})
-    address: string
+    address!: string
 
     @Column({length: 90, nullable: false})
-    city: string
+    city!: string
 
     @Column({type: 'int'})
-    postalCode: number;
+    postalCode!: number;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-    createdAt: Date;
+    createdAt!: Date;
 
-    @Column({ nullable: true })
-    transferReceipt: string;
+    @Column({type: 'text', nullable: true })
+    transferReceipt: string | undefined;
 
     @Column({ type: 'timestamp', nullable: true })
-    paymentDate: Date;
+    paymentDate: Date | undefined;
 }
