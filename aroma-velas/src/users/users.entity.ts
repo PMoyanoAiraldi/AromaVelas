@@ -9,6 +9,7 @@ export enum rolEnum {
 @Entity({
     name: 'users'
 })
+
 export class User {
 
     @PrimaryGeneratedColumn('uuid')
@@ -33,6 +34,8 @@ export class User {
     @OneToMany(() => Order, (order) => order.user)
     order!: Order[]
 
-    @Column({ default: true }) // Por defecto, el usuario estará activo
+    @Column({ default: true }) 
     state!: boolean;
+
+    
 }
