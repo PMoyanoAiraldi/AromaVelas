@@ -7,6 +7,7 @@ import { SharedModule } from 'src/shared/shared.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from 'src/users/users.module';
 import { User } from 'src/users/users.entity';
+import { UsersService } from 'src/users/users.service';
 
 
 @Module({
@@ -14,10 +15,12 @@ import { User } from 'src/users/users.entity';
         UsersModule, 
         PassportModule, 
         SharedModule, 
+        AuthModule,
         TypeOrmModule.forFeature([User])
     ],
     providers: [
         AuthService,
+        UsersService,
         JwtStrategy, // Estrategia para autenticación JWT
     ],
     controllers: [AuthController],

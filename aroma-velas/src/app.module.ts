@@ -10,6 +10,8 @@ import { OrderModule } from './order/order.module';
 import { OrderProduct } from './orderProduct/orderProduct.entity';
 import { CategoryModule } from './category/category.module';
 import { DataSourceOptions } from 'typeorm';
+import { AuthModule } from './auth/auth.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -28,9 +30,11 @@ import { DataSourceOptions } from 'typeorm';
     
   }),
   UsersModule,
+  AuthModule,
   ProductsModule,
   OrderModule,
   OrderProduct,
+  JwtModule,
   CategoryModule
 ],
   controllers: [AppController],
