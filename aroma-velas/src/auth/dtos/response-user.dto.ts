@@ -1,18 +1,19 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { User } from "src/users/users.entity";
 
-import { IsEmail, IsNotEmpty, IsOptional, IsString, Matches, MaxLength, MinLength } from "class-validator";
+export class ResponseUserDto {
 
-export class CreateUserDto {
+    @ApiProperty({
+    type: String,
+    description: "ID del usuario",
+    })
+    id!: string;
 
     @ApiProperty({
         type: String,
         description: "El nombre del usuario",
         required: true,
     })
-    @IsNotEmpty()
-    @IsString()
-    @MaxLength(80)
-    @MinLength(3)
     name!: string;
 
     @ApiProperty({
@@ -20,8 +21,6 @@ export class CreateUserDto {
         description: "La dirección del usuario",
         required: true,
     })
-    @IsString()
-    @IsOptional()
     address?: string;
 
     @ApiProperty({
@@ -29,8 +28,6 @@ export class CreateUserDto {
         description: "La ciudad del usuario",
         required: true,
     })
-    @IsString()
-    @IsOptional()
     city?: string;
 
     @ApiProperty({
@@ -38,8 +35,6 @@ export class CreateUserDto {
         description: "El país del usuario",
         required: true,
     })
-    @IsString()
-    @IsOptional()
     country?: string;
 
     @ApiProperty({
@@ -47,8 +42,6 @@ export class CreateUserDto {
         description: "El número de teléfono del usuario",
         required: true,
     })
-    @IsString()
-    @IsOptional()
     phone?: string;
 
     @ApiProperty({
@@ -56,27 +49,25 @@ export class CreateUserDto {
         description: "El correo electrónico del usuario",
         required: true,
     })
-    @IsEmail()
     email!: string;
 
     @ApiProperty({
-        type: String,
-        description: "La contraseña debe contener al menos una letra minúscula, una letra mayúscula, un número y un carácter especial (!@#$%^&*)",
-        required: true,
+    type: String,
+    description: "Rol del usuario",
     })
-    @Matches(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[=!@#$%^&*])[A-Za-z\d=!@#$%^&*]{8,15}$/,
-        {
-            message: "La contraseña debe contener al menos una letra minúscula, una letra mayúscula, un número y un carácter especial (!@#$%^&*)"
-        }
-    )
-    @IsNotEmpty()
-    @IsString()
-    password!: string;
+    rol!: string;
 
-
-
+    constructor(user: Partial<User>) {
+        this.id = user.id;
+        this.name = user.name;
+        this.email = user.email;
+        this.address = user.address;
+        this.phone = user.phone;
+        this.country = user.country;
+        this.city = user.city;
+        this.rol = user.rol;
 }
 
+}
 
 

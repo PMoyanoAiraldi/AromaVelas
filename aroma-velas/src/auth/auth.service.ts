@@ -6,6 +6,7 @@ import { User } from 'src/users/users.entity';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { LoginUserDto } from './dtos/login-user.dto';
+import { ResponseUserDto } from './dtos/response-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -54,7 +55,7 @@ async signup(createUserDto: CreateUserDto): Promise <Partial<User>>{
         }
     }
 
-    async signin(loginUser: LoginUserDto): Promise<{ usuario: Partial<User>, token: string }> {
+    async signin(loginUser: LoginUserDto): Promise<{ usuario: ResponseUserDto, token: string }> {
         try{
         const user = await this.usersRepository.findOne({ 
             where: {email: loginUser.email.toLowerCase()},
@@ -64,7 +65,7 @@ async signup(createUserDto: CreateUserDto): Promise <Partial<User>>{
 
 
         if (!user) {
-            throw new UnauthorizedException('Email o contraseña incorrecto');
+            throw new UnauthorizedException('Credenciales inválidas');
         }
     
         // Verificar si el usuario está habilitado
@@ -74,23 +75,17 @@ async signup(createUserDto: CreateUserDto): Promise <Partial<User>>{
 
         const isPasswordValid = await bcrypt.compare(loginUser.password, user.password);
 
-        console.log('Contraseña recibida en el login:', loginUser.password);
         console.log('Contraseña coincide:', isPasswordValid);
 
         if (!isPasswordValid) {
-            throw new UnauthorizedException('Email o contraseña incorrectos');
+            throw new UnauthorizedException('Credenciales inválidas');
         }
 
         const token = await this.createToken(user);
         
-        
-        // Elimina campos sensibles como contrasena
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { password, ...userWithoutPassword } = user;
-
         // Devuelve tanto el token como la información del usuario
         return {
-            usuario: userWithoutPassword,
+            usuario: new ResponseUserDto(user),
             token
         };
         } catch (error) {

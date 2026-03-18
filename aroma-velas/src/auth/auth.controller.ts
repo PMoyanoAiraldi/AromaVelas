@@ -2,6 +2,8 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from './dtos/create-user.dto';
+import { LoginUserDto } from './dtos/login-user.dto';
+import { ResponseUserDto } from './dtos/response-user.dto';
 
 @ApiTags("Auth")
 @Controller('auth')
@@ -24,5 +26,12 @@ export class AuthController {
                 user
             };
         }
+
+    @Post('signin')
+        async signin(@Body() loginUser: LoginUserDto): Promise<{ usuario: ResponseUserDto, token: string }> {
+            return this.authService.signin(loginUser);
+        }
+
+    
 
 }
