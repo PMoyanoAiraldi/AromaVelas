@@ -1,11 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { FileUploadDto } from './dto/file-upload.dto';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CloudinaryService } from './cloudinary.service';
-import { ProductService } from 'src/product/product.service';
-import {  LineaService } from 'src/linea/linea.service';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Products } from 'src/product/product.entity';
 import { Repository } from 'typeorm';
+import { Products } from 'src/products/products.entity';
 
 
 
@@ -13,24 +10,18 @@ import { Repository } from 'typeorm';
 export class FileUploadService {
     constructor(
         private readonly cloudinaryService: CloudinaryService,
-        private readonly productService: ProductService,
-        private readonly lineaService: LineaService,
         @InjectRepository(Products) 
         private readonly productsRepository: Repository<Products>,
     ){}
 
     async uploadFile(
         file: Express.Multer.File, 
-        entityType: 'product' | 'linea',
+        entityType: 'product',
         entityId?: string
     ): Promise<{ imgUrl: string }>{
     
         if (!file || !file.buffer || !file.originalname) {
             throw new Error('El archivo proporcionado no es válido');
-        }
-
-        if (!['product', 'linea'].includes(entityType)) {
-            throw new Error('El tipo de entidad proporcionado no es válido');
         }
 
         // Determinamos la carpeta según el tipo de entidad
@@ -47,9 +38,9 @@ export class FileUploadService {
 
         // Actualizar la URL de la imagen en la entidad correspondiente usando los servicios
         switch (entityType) {
-            case 'product':
+            case 'product':{
                 if (!entityId) {
-                    throw new Error('No se proporcionó un ID del producto para actualizar.');
+                    throw new BadRequestException('No se proporcionó un ID del producto');
                 }
 
                 //  Actualizar directamente en el repositorio
@@ -58,33 +49,24 @@ export class FileUploadService {
                 });
 
             if (!product) {
-                throw new Error('Producto no encontrado');
+                throw new NotFoundException('Producto no encontrado');;
             }
             
            // Eliminar la imagen anterior si existe
-                if (product.imgUrl && product.imgUrl !== 'default-image-url.jpg') {
+                if (product.img && product.img !== 'default-image-url.jpg') {
                     try {
-                        await this.cloudinaryService.deleteFile(product.imgUrl);
+                        await this.cloudinaryService.deleteFile(product.img);
                     } catch (error) {
                         console.error('Error al eliminar imagen anterior:', error);
                     }
                 }
 
                 // Actualizar solo la URL de la imagen
-                product.imgUrl = url;
+                product.img = url;
                 await this.productsRepository.save(product);
                 console.log("Imagen del producto actualizada", product);
                 break;
-
-        case 'linea':
-            // Valida si `entityId` está presente
-                if (!entityId) {
-                    throw new Error('No se proporcionó un ID de la linea para actualizar.');
-                }
-
-            await this.lineaService.update(entityId, { image: url });
-            break;
-
+            }
         default:
             throw new Error('Tipo de entidad no compatible');
         }
@@ -97,7 +79,7 @@ export class FileUploadService {
         try {
             await this.cloudinaryService.deleteFile(publicId);  // Utilizando el servicio de Cloudinary
         } catch (error) {
-            console.error('Error al eliminar el archivo de Cloudinary:', error);
+            console.error('Error:', error instanceof Error ? error.message : error);
             throw new InternalServerErrorException('Error al eliminar el archivo de Cloudinary');
         }
     }
@@ -106,10 +88,8 @@ export class FileUploadService {
         switch (entityType) {
             case 'product':
                 return 'product';
-            case 'linea':
-                return 'linea';
             default:
-                throw new Error('Tipo de entidad no compatible');
+                throw new BadRequestException('Tipo de entidad no compatible');
         }
     }
 }
