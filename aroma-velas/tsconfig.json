@@ -18,6 +18,7 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
-    "strict": false
+    "strict": false,
+    "typeRoots": ["./src/types", "./node_modules/@types"]
   }
 }

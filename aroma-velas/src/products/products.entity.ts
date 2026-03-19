@@ -9,6 +9,9 @@ export class Products{
     id!: string
 
     @Column({length: 100, unique: true})
+    name!: string
+
+    @Column({length: 100, unique: true})
     description!: string
 
     @Column({type: 'int'})
