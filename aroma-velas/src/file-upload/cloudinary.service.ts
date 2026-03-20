@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as dotenv from 'dotenv';
-import { v2 as cloudinary, UploadApiOptions} from 'cloudinary';
+import { v2 as cloudinary, UploadApiOptions, UploadApiResponse} from 'cloudinary';
 import * as crypto from 'crypto';
 
 
@@ -23,8 +23,7 @@ export class CloudinaryService {
         : `file_${Date.now()}`; // Genera un nombre predeterminado si no se proporciona uno
 
         const uniqueId = crypto.randomBytes(4).toString('hex'); // ID único para evitar conflictos
-        const publicId = `${folder}/${cleanFileName}_${uniqueId}`; // Public ID estructurado
-
+        
         // Intentar buscar archivos duplicados por hash
         const hash = crypto.createHash('sha1').update(buffer).digest('hex');
         
@@ -34,31 +33,35 @@ export class CloudinaryService {
         prefix: folder /// Filtrar por la carpeta específica
     });
 
-    const existingFile = existingFiles.resources.find(file => file.etag === hash);
+    const existingFile = existingFiles.resources.find((file: { etag: string; secure_url: string }) => file.etag === hash);
 
     if (existingFile) {
         console.log('Archivo duplicado detectado, no se subirá nuevamente.');
-        return existingFile.secure_url; // Retorna la URL existente
+        return existingFile.secure_url as string; // Retorna la URL existente
     }
 
         const options: UploadApiOptions = {
             folder, // Usamos la carpeta específica pasada como argumento
-            public_id: cleanFileName,//  ID único del archivo
+            public_id: `${cleanFileName}_${uniqueId}`,//  ID único del archivo
             resource_type: 'auto' // Automáticamente detecta el tipo
         }
 
-        return new Promise((resolve, reject) => {
+        return new Promise<string>((resolve, reject) => {
             const stream = cloudinary.uploader.upload_stream(
                 options,
-                (error, result) => {
+                (error, result: UploadApiResponse | undefined) => {
                     if (error) {
-                        reject(error);
-                    } else {
-                        console.log('Archivo subido con éxito:', result.secure_url);
-                        resolve(result.secure_url); // Retornar la URL segura
+                        //  Error 2: reject con instancia de Error
+                        reject(new Error(error.message));
+                        return;
                     }
-                },
-                
+                    if (!result) {
+                        reject(new Error('No se obtuvo resultado de Cloudinary'));
+                        return;
+                    }
+                    console.log('Archivo subido con éxito:', result.secure_url);
+                    resolve(result.secure_url);
+                }
             );
             stream.write(buffer);
             stream.end();
@@ -67,10 +70,6 @@ export class CloudinaryService {
 
 
     private extractPublicId(imageUrl: string): string {
-        // const parts = imageUrl.split('/');
-        // const fileName = parts[parts.length - 1]; // Última parte de la URL
-        // const publicId = fileName.split('.')[0]; // Remover extensión
-        // return publicId; 
         const urlWithoutQuery = imageUrl.split('?')[0]; // Remover parámetros de consulta si existen
         const pathSegments = urlWithoutQuery.split('/'); 
         const folderAndFile = pathSegments.slice(-2); // Extraer los últimos dos segmentos (carpeta y archivo)
@@ -81,7 +80,7 @@ export class CloudinaryService {
     async deleteFile(imageUrl: string): Promise<void> {
         const publicId = this.extractPublicId(imageUrl);
         try {
-            const result = await cloudinary.uploader.destroy(publicId);
+            const result = await cloudinary.uploader.destroy(publicId) as { result: string };
             if (result.result === 'ok') {
                 console.log(`Archivo con public_id ${publicId} eliminado exitosamente.`);
             } else {

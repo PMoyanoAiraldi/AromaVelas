@@ -2,10 +2,9 @@ import { Module } from '@nestjs/common';
 import { FileUploadService } from './file-upload.service';
 import { CloudinaryService } from './cloudinary.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from 'src/user/users.entity';
-import { UserService } from 'src/user/users.service';
-import { LineaService } from 'src/linea/linea.service';
-import { Products } from 'src/product/product.entity';
+import { User } from 'src/users/users.entity';
+import { UsersService } from 'src/users/users.service';
+import { Products } from 'src/products/products.entity';
 
 
 @Module({
@@ -13,7 +12,7 @@ import { Products } from 'src/product/product.entity';
     TypeOrmModule.forFeature([User, Products]),
   
   ],
-  providers: [FileUploadService,UserService, CloudinaryService,  LineaService],
+  providers: [FileUploadService,UsersService, CloudinaryService],
   controllers: [],
   exports: [FileUploadService,  CloudinaryService]
 })

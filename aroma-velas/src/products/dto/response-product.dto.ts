@@ -30,4 +30,7 @@ export class ResponseProductDto {
     @ApiProperty()
     @Expose()
     categoryId!: string;
+
+    @ApiProperty()
+    state: boolean;
 }

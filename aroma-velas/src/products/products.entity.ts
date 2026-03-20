@@ -23,6 +23,13 @@ export class Products{
     @Column({type: 'int'})
     stock!: number
 
+    /**
+    * El estado del producto
+    * @example 'true'
+    */
+    @Column({ default: true }) // Por defecto, el producto estará activo
+    state: boolean;
+
     @Column({ type: 'uuid', name: "categoryId", nullable: false })
     categoryId!: string;
 
