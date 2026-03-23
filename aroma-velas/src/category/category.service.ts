@@ -140,7 +140,9 @@ constructor(
                 state: product.state,
                 price: product.price,
                 stock: product.stock,
-                categoryId: product.category?.id,
+                category: {
+                    id: product.category?.id,
+                    name: product.category?.name,}
             };
         }
 
